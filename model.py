@@ -91,16 +91,18 @@ def get_similarities(song_name, data):
 
 
 def recommend_songs(song_name, data=tracks):
-    # Base case
-    if tracks[tracks['song'] == song_name].shape[0] == 1:
-        print('This song is either not so popular or you\ have entered invalid_name.\n Some songs you may like:\n')
+    # Check if the song exists in the dataset
+    if tracks[tracks['song'] == song_name].shape[0] == 0:
+        print('This song is either not so popular or you have entered an invalid name.\n Some songs you may like:\n')
+        return data.sample(n=5)['song'].values.tolist()  # Return 5 random songs if no match
 
-    for song1 in data.sample(n=5)['song'].values:
-        print(song1)
-
-    return
+    # Calculate similarity factors for the given song
     data['similarity_factor'] = get_similarities(song_name, data)
+    # Sort songs based on similarity factor and popularity
     data.sort_values(by=['similarity_factor', 'popularity'], ascending=[False, False], inplace=True)
+    
+    # Return the top 5 recommendations
+    return data['song'].head(5).values.tolist()
 
     # First song will be the input song itself as the similarity will be highest.
 
